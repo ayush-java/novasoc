@@ -1,19 +1,49 @@
-# SOC + SIEM Threat Detection System
+# 🔐 SOC + SIEM Threat Detection & Automated Response System
 
-## Overview
+## 🚀 Overview
 
-This project builds a Security Operations Center (SOC) pipeline that ingests logs, detects cyber attacks, and automatically responds.
+This project simulates a real-world Security Operations Center (SOC) pipeline using the ELK Stack (Elasticsearch, Logstash, Kibana).
 
-## Features
+It ingests system logs, detects SSH brute-force attacks, visualizes attack patterns, and performs automated response actions such as blocking malicious IPs.
 
-- Log ingestion using Filebeat
-- Data processing using Logstash
-- Storage using Elasticsearch
-- Visualization using Kibana
-- Threat detection using Python
-- Automated IP blocking
-- Threat intelligence integration
+---
 
-## Architecture
+## 🧠 Key Features
 
-See docs/architecture.md
+- 📥 Log ingestion using Filebeat
+- 🔄 Log processing and parsing using Logstash
+- 🗄️ Storage and indexing using Elasticsearch
+- 📊 Real-time dashboards using Kibana
+- 🚨 Detection of SSH brute-force attacks
+- 🤖 Automated response system (IP blocking simulation)
+- 📈 Visual analytics for attack trends and top attackers
+
+---
+
+## 🛠️ Tech Stack
+
+- ELK Stack (Elasticsearch, Logstash, Kibana)
+- Filebeat
+- Docker & Docker Compose
+- Python (automation scripts)
+
+---
+
+## 📊 Dashboard Visualizations
+
+- **Failed Login Attempts Over Time**  
+  → Detects spikes indicating brute-force attacks  
+
+- **Top Attacking IPs**  
+  → Identifies most frequent attack sources  
+
+---
+
+## 🧱 Architecture
+
+```text
+Filebeat → Logstash → Elasticsearch → Kibana
+                      ↓
+                Python Scripts
+                      ↓
+               Automated Response
