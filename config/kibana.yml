@@ -1,0 +1,6 @@
+server.host: "0.0.0.0"
+elasticsearch.hosts: ["http://elasticsearch:9200"]
+
+xpack.encryptedSavedObjects.encryptionKey: "this_is_a_super_secret_key_1234567890"
+xpack.reporting.encryptionKey: "this_is_a_super_secret_key_1234567890"
+xpack.security.encryptionKey: "this_is_a_super_secret_key_1234567890"
