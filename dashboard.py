@@ -100,8 +100,7 @@ st.sidebar.markdown("""
 # =====================================================
 # FILES
 # =====================================================
-
-BLOCKED_FILE = "data/blocked_ips.txt"
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 # =====================================================
 # LOAD ALERTS FROM POSTGRESQL
