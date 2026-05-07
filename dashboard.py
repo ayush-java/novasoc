@@ -139,6 +139,28 @@ if os.path.exists(BLOCKED_FILE):
 df = pd.DataFrame(alerts)
 
 # =====================================================
+# HANDLE EMPTY DATA SAFELY
+# =====================================================
+
+required_columns = [
+    "timestamp",
+    "ip",
+    "country",
+    "attack_type",
+    "severity",
+    "status",
+    "threat_score",
+    "mitre_tactic"
+]
+
+if df.empty:
+    df = pd.DataFrame(columns=required_columns)
+
+for col in required_columns:
+    if col not in df.columns:
+        df[col] = None
+
+# =====================================================
 # HEADER
 # =====================================================
 
