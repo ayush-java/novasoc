@@ -1,29 +1,65 @@
-# 🔐 SOC + SIEM + SOAR Threat Detection & Automated Response System
+## ✅ SOAR Automation
 
-## 🚀 Overview
+Automated response engine built with Python.
 
-This project is a **complete end-to-end Security Operations Center (SOC)** system that integrates **SIEM (ELK Stack)** and **SOAR (automated response)** to simulate a real-world cybersecurity pipeline.
+When threats are detected:
 
-It performs:
-
-* Real-time log collection
-* Log parsing and transformation
-* Threat detection (SSH brute force)
-* Automated response (IP blocking)
-* Incident tracking and logging
+- Malicious IPs are blocked
+- Incidents are logged
+- Alerts are generated
+- Threat telemetry is updated
 
 ---
 
-## 🧠 Why This Project Matters
+## ✅ Enterprise Streamlit Dashboard
 
-Modern security teams rely on **SOC + SIEM + SOAR systems** to detect and respond to threats in real-time.
+Custom-built enterprise cybersecurity dashboard using:
 
-This project demonstrates:
+- Streamlit
+- Plotly
+- Python
 
-* Real-world security pipeline design
-* Automation of detection and response
-* Hands-on experience with industry tools
-* Cloud-ready cybersecurity architecture
+Dashboard includes:
+
+- Real-time SOC metrics
+- Live incident feeds
+- Global cyber threat map
+- MITRE ATT&CK analytics
+- Severity distribution
+- Threat intelligence panels
+- Infrastructure monitoring
+- Attack type analytics
+- Cloud deployment status
+
+---
+
+## 🌍 Global Threat Intelligence Map
+
+The dashboard visualizes simulated cyberattacks originating from multiple countries worldwide including:
+
+- Russia
+- China
+- Iran
+- North Korea
+- Brazil
+- Germany
+- USA
+
+---
+
+## ⚡ Live Attack Simulation
+
+A custom Python telemetry generator continuously creates:
+
+- fake cyberattacks
+- simulated threat activity
+- real-time incident updates
+
+This allows:
+
+- live dashboard updates
+- dynamic analytics
+- realistic SOC demonstrations
 
 ---
 
@@ -31,156 +67,214 @@ This project demonstrates:
 
 ![SOC Architecture](docs/architecture.png)
 
-
-```
-Log Source → Filebeat → Logstash → Elasticsearch → Kibana
-                                       ↓
-                         Python Detection Engine
-                                       ↓
-                          Auto Response (SOAR)
-                                       ↓
-                     alerts.json + blocked_ips.txt
+```text
+Attacker Activity
+        ↓
+Linux Authentication Logs
+        ↓
+Filebeat
+        ↓
+Logstash
+        ↓
+Elasticsearch
+        ↓
+Python Detection Engine
+        ↓
+SOAR Automation
+        ↓
+IP Blocking + Incident Logging
+        ↓
+Streamlit Enterprise Dashboard
 ```
 
 ---
 
-## ⚙️ Tech Stack
+## ⚙️ Technology Stack
 
-| Component        | Technology Used       |
-| ---------------- | --------------------- |
-| Log Collection   | Filebeat              |
-| Processing       | Logstash              |
-| Storage          | Elasticsearch         |
-| Visualization    | Kibana                |
-| Detection        | Python                |
-| Automation       | Python (SOAR scripts) |
-| Containerization | Docker                |
+| Category | Technology |
+|---|---|
+| Frontend | Streamlit |
+| Visualization | Plotly |
+| Backend | Python |
+| SIEM | ELK Stack |
+| Cloud | AWS EC2 |
+| Containers | Docker |
+| Detection Engine | Python |
+| Automation | Python SOAR Scripts |
+| Threat Analytics | MITRE ATT&CK |
+| Data Processing | Pandas |
 
 ---
 
-## 🔄 System Workflow
+## ☁️ Cloud Deployment
 
-1. Logs are generated (SSH failed login attempts)
-2. Filebeat collects logs in real-time
-3. Logstash parses and structures the logs
-4. Elasticsearch stores and indexes data
-5. Kibana visualizes logs in dashboards
-6. Python detection engine analyzes logs
-7. If attack detected → IP is blocked automatically
-8. Incident is logged
+The platform is deployed on:
+
+- AWS EC2 Ubuntu Server
+- Dockerized infrastructure
+- Public cloud-hosted dashboard
+
+Deployment includes:
+
+- Real-time monitoring
+- SOAR automation
+- Threat analytics
+- Cloud infrastructure management
+
+---
+
+## 📊 Dashboard Features
+
+### Overview Tab
+
+- Total alerts
+- Threat scores
+- Severity charts
+- Attack timelines
+- Global threat map
+
+### Incidents Tab
+
+- Incident tables
+- Live attack telemetry
+- Blocked IP tracking
+
+### Threat Intelligence Tab
+
+- MITRE ATT&CK analytics
+- Critical threat monitoring
+- Threat intelligence panels
+
+### Infrastructure Tab
+
+- AWS infrastructure status
+- Docker container monitoring
+- SOC pipeline visualization
 
 ---
 
 ## 🚨 Detection Logic
 
-The system detects brute-force attacks using:
+The platform uses:
 
-* Threshold-based detection
-* Time window analysis
-* IP-based grouping
+- threshold-based detection
+- IP grouping
+- time-window analysis
+- threat scoring
+- severity classification
 
 Example:
 
-* More than **20 failed logins**
-* Within **5 minutes**
-* From the same IP
+- 20+ failed logins
+- within 5 minutes
+- from the same IP
+
+→ triggers automated SOAR response
 
 ---
 
-## ⚡ Automated Response (SOAR)
+## ⚡ Automated SOAR Response
 
-When an attack is detected:
+When threats are detected:
 
-* 🚫 Attacker IP is blocked
-* 📝 Incident is logged in `alerts.json`
-* 📁 IP is stored in `blocked_ips.txt`
-
----
-
-## 🧪 Demo (How to Run)
-
-### 1. Start Detection Engine
-
-```
-python3 scripts/detect_bruteforce.py
-```
-
-### 2. Simulate Attack
-
-```
-for i in {1..30}; do
-  echo "Failed password for invalid user admin from 192.168.1.250 port 22 ssh2" >> data/test.log
-done
-```
-
-### 3. Expected Output
-
-```
-🚨 BRUTE FORCE DETECTED from 192.168.1.250
-🚫 Blocking IP: 192.168.1.250
-```
-
----
-
-## 📊 Kibana Dashboard
-
-The project includes:
-
-* Failed login attempts over time
-* Top attacking IP addresses
-* Real-time monitoring
+- 🚫 attacker IPs are blocked
+- 📝 incidents are logged
+- 📊 dashboard updates automatically
+- 🌍 threat map updates in real time
 
 ---
 
 ## 📁 Project Structure
 
-```
+```text
 soc-siem-threat-detection/
 ├── config/
 ├── data/
+│   ├── alerts.json
+│   └── blocked_ips.txt
 ├── docs/
 │   └── architecture.png
 ├── scripts/
 │   ├── detect_bruteforce.py
 │   ├── block_ip.py
 │   └── auto_block.py
+├── dashboard.py
+├── live_attack_generator.py
 ├── docker-compose.yml
 └── README.md
 ```
 
 ---
 
-## ☁️ Cloud Deployment
+## 🧪 How To Run
 
-This system is designed to be deployed on:
+### 1. Clone Repository
 
-* AWS (EC2)
-* Microsoft Azure
-* Any Linux-based cloud environment
+```bash
+git clone https://github.com/ayush-java/soc-siem-threat-detection.git
+cd soc-siem-threat-detection
+```
 
-It is **scalable and production-ready** for real-time monitoring systems.
+### 2. Create Virtual Environment
 
----
+```bash
+sudo apt install python3.14-venv -y
+python3 -m venv venv
+source venv/bin/activate
+```
 
-## 🧹 Features Implemented
+### 3. Install Dependencies
 
-* ✅ ELK Stack pipeline (Filebeat → Logstash → Elasticsearch → Kibana)
-* ✅ Real-time log ingestion
-* ✅ Custom Python detection engine
-* ✅ Automated IP blocking (SOAR)
-* ✅ Incident tracking system
-* ✅ Dockerized architecture
-* ✅ Cloud-ready design
+```bash
+pip install streamlit pandas plotly
+```
+
+### 4. Start Streamlit Dashboard
+
+```bash
+python3 -m streamlit run dashboard.py --server.port 8501 --server.address 0.0.0.0
+```
+
+### 5. Start Live Attack Generator
+
+Open another terminal:
+
+```bash
+source venv/bin/activate
+python3 live_attack_generator.py
+```
 
 ---
 
 ## 🎯 Learning Outcomes
 
-* Built a full SOC system from scratch
-* Implemented SIEM + SOAR integration
-* Designed real-time detection pipelines
-* Automated threat response
-* Learned industry tools used in cybersecurity
+This project demonstrates:
+
+- SOC engineering
+- SIEM architecture
+- SOAR automation
+- Cloud deployment
+- Threat intelligence
+- MITRE ATT&CK analysis
+- Docker containerization
+- Security analytics
+- Cybersecurity dashboard engineering
+- Real-time monitoring systems
+
+---
+
+## 📌 Future Improvements
+
+Planned upgrades:
+
+- Machine learning anomaly detection
+- Email & Slack alerting
+- Firewall API integration
+- Multi-cloud deployment
+- Threat intelligence API integration
+- Real attack telemetry ingestion
+- User authentication
+- Role-based SOC access control
 
 ---
 
@@ -188,22 +282,18 @@ It is **scalable and production-ready** for real-time monitoring systems.
 
 **Ayush Velhal**
 
-* Fully designed and implemented independently
-* End-to-end system architecture and development
+- Designed and implemented independently
+- End-to-end architecture and development
+- Cloud deployment and dashboard engineering
 
 ---
 
-## ⭐ Future Improvements
+## ⭐ Final Note
 
-* Integrate real firewall APIs (AWS Security Groups / Azure NSG)
-* Add email/Slack alerts
-* Use machine learning for anomaly detection
-* Deploy fully on cloud with monitoring
+This project simulates a real-world:
 
----
+- Security Operations Center (SOC)
+- Security Information and Event Management (SIEM)
+- Security Orchestration Automation and Response (SOAR)
 
-## 📌 Final Note
-
-This project represents a **real-world cybersecurity system simulation**, combining **log analysis, threat detection, and automated response**, similar to enterprise SOC environments.
-
-<!-- test -->
+platform using cloud infrastructure, real-time analytics, automated response pipelines, and enterprise-style cybersecurity dashboards.
