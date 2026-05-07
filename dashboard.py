@@ -5,6 +5,7 @@ import os
 import time
 from datetime import datetime
 import plotly.express as px
+import psycopg2
 
 # =====================================================
 # PAGE CONFIG
@@ -80,6 +81,7 @@ st.sidebar.markdown("""
 - AWS EC2
 - Docker
 - ELK Stack
+- PostgreSQL
 - Python SOAR
 - Streamlit SOC
 
@@ -99,30 +101,58 @@ st.sidebar.markdown("""
 # FILES
 # =====================================================
 
-ALERTS_FILE = "data/alerts.json"
 BLOCKED_FILE = "data/blocked_ips.txt"
 
 # =====================================================
-# LOAD ALERTS
+# LOAD ALERTS FROM POSTGRESQL
 # =====================================================
 
-alerts = []
+DATABASE_URL = st.secrets["DATABASE_URL"]
 
-if os.path.exists(ALERTS_FILE):
+conn = psycopg2.connect(DATABASE_URL)
 
-    with open(ALERTS_FILE, "r") as f:
+query = """
+SELECT
+    timestamp,
+    ip,
+    country,
+    attack_type,
+    severity,
+    status,
+    threat_score,
+    mitre_tactic
+FROM alerts
+ORDER BY id DESC
+LIMIT 500
+"""
 
-        for line in f:
+df = pd.read_sql(query, conn)
 
-            line = line.strip()
+# =====================================================
+# HANDLE EMPTY DATA SAFELY
+# =====================================================
 
-            if line:
+required_columns = [
+    "timestamp",
+    "ip",
+    "country",
+    "attack_type",
+    "severity",
+    "status",
+    "threat_score",
+    "mitre_tactic"
+]
 
-                try:
-                    alerts.append(json.loads(line))
+if df.empty:
+    df = pd.DataFrame(columns=required_columns)
 
-                except:
-                    pass
+for col in required_columns:
+    if col not in df.columns:
+        df[col] = None
+
+# =====================================================
+# LOAD BLOCKED IPS
+# =====================================================
 
 blocked_ips = []
 
@@ -135,8 +165,6 @@ if os.path.exists(BLOCKED_FILE):
             for line in f
             if line.strip()
         ]
-
-df = pd.DataFrame(alerts)
 
 # =====================================================
 # HANDLE EMPTY DATA SAFELY
@@ -182,7 +210,7 @@ total_blocked = len(blocked_ips)
 latest_attacker = "N/A"
 
 if total_alerts > 0:
-    latest_attacker = df.iloc[-1]["ip"]
+    latest_attacker = df.iloc[0]["ip"]
 
 threat_level = "LOW"
 
@@ -199,41 +227,26 @@ avg_threat_score = 0
 
 if total_alerts > 0:
     avg_threat_score = round(
-        df["threat_score"].mean(),
+        pd.to_numeric(df["threat_score"]).mean(),
         2
     )
 
 metric1, metric2, metric3, metric4, metric5 = st.columns(5)
 
 with metric1:
-    st.metric(
-        "🚨 Total Alerts",
-        total_alerts
-    )
+    st.metric("🚨 Total Alerts", total_alerts)
 
 with metric2:
-    st.metric(
-        "🚫 Blocked IPs",
-        total_blocked
-    )
+    st.metric("🚫 Blocked IPs", total_blocked)
 
 with metric3:
-    st.metric(
-        "🎯 Latest Attacker",
-        latest_attacker
-    )
+    st.metric("🎯 Latest Attacker", latest_attacker)
 
 with metric4:
-    st.metric(
-        "⚠️ Threat Level",
-        threat_level
-    )
+    st.metric("⚠️ Threat Level", threat_level)
 
 with metric5:
-    st.metric(
-        "🔥 Avg Threat Score",
-        avg_threat_score
-    )
+    st.metric("🔥 Avg Threat Score", avg_threat_score)
 
 st.markdown("---")
 
@@ -447,7 +460,7 @@ with tab1:
 
     st.subheader("🛰️ Live SOC Feed")
 
-    latest_alerts = df.tail(10)
+    latest_alerts = df.head(10)
 
     for _, row in latest_alerts.iterrows():
 
@@ -600,17 +613,15 @@ with tab4:
     st.code("""
 Attacker
    ↓
-Linux Authentication Logs
+Live Attack Generator
    ↓
-Python Detection Engine
+EC2 Telemetry Pipeline
+   ↓
+PostgreSQL Database
    ↓
 SIEM Analysis
    ↓
 SOAR Automation
-   ↓
-IP Blocking
-   ↓
-Incident Logging
    ↓
 Streamlit Dashboard
 """)
@@ -623,6 +634,7 @@ Streamlit Dashboard
 Cloud Provider : AWS EC2
 Frontend       : Streamlit
 Backend        : Python
+Database       : PostgreSQL
 Containers     : Docker
 Security Stack : ELK Stack
 OS             : Ubuntu Linux
@@ -648,6 +660,9 @@ Last Updated: {current_time}
 # AUTO REFRESH
 # =====================================================
 
+time.sleep(refresh_rate)
+
+st.rerun()
 time.sleep(refresh_rate)
 
 st.rerun()
