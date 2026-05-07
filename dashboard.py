@@ -1,0 +1,631 @@
+import streamlit as st
+import pandas as pd
+import json
+import os
+import time
+from datetime import datetime
+import plotly.express as px
+
+# =====================================================
+# PAGE CONFIG
+# =====================================================
+
+st.set_page_config(
+    page_title="SOC Enterprise Dashboard",
+    page_icon="🛡️",
+    layout="wide"
+)
+
+# =====================================================
+# CUSTOM CSS
+# =====================================================
+
+st.markdown("""
+<style>
+
+html, body, [class*="css"] {
+    background-color: #0b0f19;
+    color: white;
+    font-family: Arial;
+}
+
+.main {
+    background-color: #0b0f19;
+}
+
+.block-container {
+    padding-top: 1rem;
+}
+
+h1, h2, h3 {
+    color: #00ffcc;
+}
+
+div[data-testid="metric-container"] {
+    background-color: #111827;
+    border: 1px solid #1f2937;
+    padding: 20px;
+    border-radius: 15px;
+}
+
+section[data-testid="stSidebar"] {
+    background-color: #111827;
+}
+
+.stDataFrame {
+    background-color: #111827;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+# =====================================================
+# SIDEBAR
+# =====================================================
+
+st.sidebar.title("🛡️ SOC Enterprise")
+
+refresh_rate = st.sidebar.slider(
+    "Auto Refresh",
+    5,
+    60,
+    10
+)
+
+st.sidebar.success("SOC STATUS: ACTIVE")
+
+st.sidebar.markdown("""
+## Infrastructure
+
+- AWS EC2
+- Docker
+- ELK Stack
+- Python SOAR
+- Streamlit SOC
+
+---
+
+## Detection Engines
+
+- SSH Brute Force
+- SQL Injection
+- DDoS Detection
+- Malware Detection
+- Privilege Escalation
+- Port Scan Detection
+""")
+
+# =====================================================
+# FILES
+# =====================================================
+
+ALERTS_FILE = "data/alerts.json"
+BLOCKED_FILE = "data/blocked_ips.txt"
+
+# =====================================================
+# LOAD ALERTS
+# =====================================================
+
+alerts = []
+
+if os.path.exists(ALERTS_FILE):
+
+    with open(ALERTS_FILE, "r") as f:
+
+        for line in f:
+
+            line = line.strip()
+
+            if line:
+
+                try:
+                    alerts.append(json.loads(line))
+
+                except:
+                    pass
+
+blocked_ips = []
+
+if os.path.exists(BLOCKED_FILE):
+
+    with open(BLOCKED_FILE, "r") as f:
+
+        blocked_ips = [
+            line.strip()
+            for line in f
+            if line.strip()
+        ]
+
+df = pd.DataFrame(alerts)
+
+# =====================================================
+# HEADER
+# =====================================================
+
+st.title("🛡️ SOC + SIEM + SOAR Enterprise Dashboard")
+
+st.markdown("""
+Real-time cybersecurity monitoring and automated response platform deployed on AWS EC2.
+""")
+
+st.markdown("---")
+
+# =====================================================
+# METRICS
+# =====================================================
+
+total_alerts = len(df)
+total_blocked = len(blocked_ips)
+
+latest_attacker = "N/A"
+
+if total_alerts > 0:
+    latest_attacker = df.iloc[-1]["ip"]
+
+threat_level = "LOW"
+
+if total_alerts >= 10:
+    threat_level = "MEDIUM"
+
+if total_alerts >= 20:
+    threat_level = "HIGH"
+
+if total_alerts >= 30:
+    threat_level = "CRITICAL"
+
+avg_threat_score = 0
+
+if total_alerts > 0:
+    avg_threat_score = round(
+        df["threat_score"].mean(),
+        2
+    )
+
+metric1, metric2, metric3, metric4, metric5 = st.columns(5)
+
+with metric1:
+    st.metric(
+        "🚨 Total Alerts",
+        total_alerts
+    )
+
+with metric2:
+    st.metric(
+        "🚫 Blocked IPs",
+        total_blocked
+    )
+
+with metric3:
+    st.metric(
+        "🎯 Latest Attacker",
+        latest_attacker
+    )
+
+with metric4:
+    st.metric(
+        "⚠️ Threat Level",
+        threat_level
+    )
+
+with metric5:
+    st.metric(
+        "🔥 Avg Threat Score",
+        avg_threat_score
+    )
+
+st.markdown("---")
+
+# =====================================================
+# TABS
+# =====================================================
+
+tab1, tab2, tab3, tab4 = st.tabs([
+    "📊 Overview",
+    "🚨 Incidents",
+    "🌍 Threat Intel",
+    "☁️ Infrastructure"
+])
+
+# =====================================================
+# TAB 1 - OVERVIEW
+# =====================================================
+
+with tab1:
+
+    row1_col1, row1_col2 = st.columns(2)
+
+    # =================================================
+    # ATTACK TIMELINE
+    # =================================================
+
+    with row1_col1:
+
+        st.subheader("📈 Attack Timeline")
+
+        if total_alerts > 0:
+
+            timeline_df = df.copy()
+
+            timeline_df["event"] = 1
+
+            fig_timeline = px.line(
+                timeline_df,
+                x=timeline_df.index,
+                y="event",
+                title="Attack Timeline"
+            )
+
+            fig_timeline.update_layout(
+                paper_bgcolor="#0b0f19",
+                plot_bgcolor="#0b0f19",
+                font_color="white"
+            )
+
+            st.plotly_chart(
+                fig_timeline,
+                use_container_width=True
+            )
+
+    # =================================================
+    # SEVERITY DONUT CHART
+    # =================================================
+
+    with row1_col2:
+
+        st.subheader("🔥 Severity Distribution")
+
+        severity_counts = (
+            df["severity"]
+            .value_counts()
+            .reset_index()
+        )
+
+        severity_counts.columns = [
+            "Severity",
+            "Count"
+        ]
+
+        fig_severity = px.pie(
+            severity_counts,
+            values="Count",
+            names="Severity",
+            hole=0.45,
+            title="Threat Severity Levels"
+        )
+
+        fig_severity.update_layout(
+            paper_bgcolor="#0b0f19",
+            plot_bgcolor="#0b0f19",
+            font_color="white"
+        )
+
+        st.plotly_chart(
+            fig_severity,
+            use_container_width=True
+        )
+
+    st.markdown("---")
+
+    row2_col1, row2_col2 = st.columns(2)
+
+    # =================================================
+    # ATTACK TYPES
+    # =================================================
+
+    with row2_col1:
+
+        st.subheader("🧨 Attack Type Distribution")
+
+        attack_counts = (
+            df["attack_type"]
+            .value_counts()
+            .reset_index()
+        )
+
+        attack_counts.columns = [
+            "Attack Type",
+            "Count"
+        ]
+
+        fig_attack = px.bar(
+            attack_counts,
+            x="Attack Type",
+            y="Count",
+            title="Attack Categories"
+        )
+
+        fig_attack.update_layout(
+            paper_bgcolor="#0b0f19",
+            plot_bgcolor="#0b0f19",
+            font_color="white"
+        )
+
+        st.plotly_chart(
+            fig_attack,
+            use_container_width=True
+        )
+
+    # =================================================
+    # WORLD THREAT MAP
+    # =================================================
+
+    with row2_col2:
+
+        st.subheader("🌍 Global Threat Map")
+
+        country_coords = {
+            "Russia": {"lat": 61.5240, "lon": 105.3188},
+            "China": {"lat": 35.8617, "lon": 104.1954},
+            "Iran": {"lat": 32.4279, "lon": 53.6880},
+            "North Korea": {"lat": 40.3399, "lon": 127.5101},
+            "Brazil": {"lat": -14.2350, "lon": -51.9253},
+            "Germany": {"lat": 51.1657, "lon": 10.4515},
+            "USA": {"lat": 37.0902, "lon": -95.7129}
+        }
+
+        country_counts = (
+            df["country"]
+            .value_counts()
+            .reset_index()
+        )
+
+        country_counts.columns = [
+            "country",
+            "count"
+        ]
+
+        latitudes = []
+        longitudes = []
+
+        for country in country_counts["country"]:
+
+            coords = country_coords.get(
+                country,
+                {"lat": 0, "lon": 0}
+            )
+
+            latitudes.append(coords["lat"])
+            longitudes.append(coords["lon"])
+
+        country_counts["lat"] = latitudes
+        country_counts["lon"] = longitudes
+
+        fig_map = px.scatter_geo(
+            country_counts,
+            lat="lat",
+            lon="lon",
+            size="count",
+            hover_name="country",
+            color="count",
+            projection="natural earth",
+            title="Global Cyber Threat Activity"
+        )
+
+        fig_map.update_layout(
+            paper_bgcolor="#0b0f19",
+            font_color="white",
+            geo=dict(
+                bgcolor="#0b0f19",
+                showland=True,
+                landcolor="#1f2937",
+                showcountries=True
+            )
+        )
+
+        st.plotly_chart(
+            fig_map,
+            use_container_width=True
+        )
+
+    st.markdown("---")
+
+    # =================================================
+    # LIVE SOC FEED
+    # =================================================
+
+    st.subheader("🛰️ Live SOC Feed")
+
+    latest_alerts = df.tail(10)
+
+    for _, row in latest_alerts.iterrows():
+
+        severity = row["severity"]
+        attack = row["attack_type"]
+        ip = row["ip"]
+        country = row["country"]
+        timestamp = row["timestamp"]
+
+        if severity == "CRITICAL":
+
+            st.error(
+                f"🚨 {severity} | {attack} detected from {ip} ({country}) at {timestamp}"
+            )
+
+        elif severity == "HIGH":
+
+            st.warning(
+                f"⚠️ {severity} | {attack} detected from {ip} ({country}) at {timestamp}"
+            )
+
+        else:
+
+            st.info(
+                f"ℹ️ {severity} | {attack} detected from {ip} ({country}) at {timestamp}"
+            )
+
+# =====================================================
+# TAB 2 - INCIDENTS
+# =====================================================
+
+with tab2:
+
+    st.subheader("🚨 Incident Alert Table")
+
+    st.dataframe(
+        df,
+        use_container_width=True
+    )
+
+    st.markdown("---")
+
+    st.subheader("🚫 Blocked IP Addresses")
+
+    blocked_df = pd.DataFrame(
+        blocked_ips,
+        columns=["Blocked IP"]
+    )
+
+    st.dataframe(
+        blocked_df,
+        use_container_width=True
+    )
+
+# =====================================================
+# TAB 3 - THREAT INTEL
+# =====================================================
+
+with tab3:
+
+    intel1, intel2, intel3 = st.columns(3)
+
+    with intel1:
+        st.error("""
+### Top Threat
+Credential Access
+""")
+
+    with intel2:
+        st.warning("""
+### Most Targeted Service
+Linux SSH
+""")
+
+    with intel3:
+        st.success("""
+### SOAR Response
+Automatic IP Blocking
+""")
+
+    st.markdown("---")
+
+    st.subheader("🎯 MITRE ATT&CK Tactics")
+
+    mitre_counts = (
+        df["mitre_tactic"]
+        .value_counts()
+        .reset_index()
+    )
+
+    mitre_counts.columns = [
+        "MITRE Tactic",
+        "Count"
+    ]
+
+    fig_mitre = px.bar(
+        mitre_counts,
+        x="MITRE Tactic",
+        y="Count",
+        title="MITRE ATT&CK Analytics"
+    )
+
+    fig_mitre.update_layout(
+        paper_bgcolor="#0b0f19",
+        plot_bgcolor="#0b0f19",
+        font_color="white"
+    )
+
+    st.plotly_chart(
+        fig_mitre,
+        use_container_width=True
+    )
+
+    st.markdown("---")
+
+    st.subheader("🔥 Critical Incidents")
+
+    critical_df = df[
+        df["severity"] == "CRITICAL"
+    ]
+
+    st.dataframe(
+        critical_df,
+        use_container_width=True
+    )
+
+# =====================================================
+# TAB 4 - INFRASTRUCTURE
+# =====================================================
+
+with tab4:
+
+    st.subheader("☁️ Cloud Infrastructure")
+
+    infra1, infra2, infra3 = st.columns(3)
+
+    with infra1:
+        st.success("AWS EC2: RUNNING")
+
+    with infra2:
+        st.success("Docker Containers: ACTIVE")
+
+    with infra3:
+        st.success("Dashboard: ONLINE")
+
+    st.markdown("---")
+
+    st.subheader("🏗️ SOC + SIEM + SOAR Pipeline")
+
+    st.code("""
+Attacker
+   ↓
+Linux Authentication Logs
+   ↓
+Python Detection Engine
+   ↓
+SIEM Analysis
+   ↓
+SOAR Automation
+   ↓
+IP Blocking
+   ↓
+Incident Logging
+   ↓
+Streamlit Dashboard
+""")
+
+    st.markdown("---")
+
+    st.subheader("🚀 Deployment Information")
+
+    st.code("""
+Cloud Provider : AWS EC2
+Frontend       : Streamlit
+Backend        : Python
+Containers     : Docker
+Security Stack : ELK Stack
+OS             : Ubuntu Linux
+""")
+
+# =====================================================
+# FOOTER
+# =====================================================
+
+st.markdown("---")
+
+current_time = datetime.now().strftime(
+    "%Y-%m-%d %H:%M:%S"
+)
+
+st.caption(f"""
+SOC + SIEM + SOAR Enterprise Dashboard
+
+Last Updated: {current_time}
+""")
+
+# =====================================================
+# AUTO REFRESH
+# =====================================================
+
+time.sleep(refresh_rate)
+
+st.rerun()
