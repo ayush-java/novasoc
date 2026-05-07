@@ -106,8 +106,6 @@ DATABASE_URL = os.getenv("DATABASE_URL")
 # LOAD ALERTS FROM POSTGRESQL
 # =====================================================
 
-DATABASE_URL = st.secrets["DATABASE_URL"]
-
 conn = psycopg2.connect(DATABASE_URL)
 
 query = """
