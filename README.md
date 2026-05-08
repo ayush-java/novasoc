@@ -21,6 +21,23 @@ The platform detects threats, visualizes cyberattacks, automatically responds to
 
 ---
 
+## 🎥 Live Demo Video
+
+Watch the full project walkthrough and live demonstration here:
+
+👉 https://www.loom.com/share/2c5df19198724f3fbf375cb88da77521
+
+The demo includes:
+
+- architecture walkthrough
+- real-time attack simulation
+- live SOC telemetry
+- SIEM analytics
+- MITRE ATT&CK monitoring
+- SOAR automation
+- cloud deployment overview
+- GitHub repository walkthrough
+
 ## ✅ Key Features
 
 - ✅ Real-time threat detection
@@ -34,6 +51,9 @@ The platform detects threats, visualizes cyberattacks, automatically responds to
 - ✅ Cloud deployment on AWS EC2
 - ✅ Dockerized infrastructure
 - ✅ Live attack simulation engine
+- ✅ PostgreSQL telemetry integration
+- ✅ Cloud-hosted live deployment
+- ✅ Real-time database-backed analytics
 
 ---
 
@@ -70,8 +90,10 @@ Streamlit Enterprise Dashboard
 | Frontend | Streamlit |
 | Visualization | Plotly |
 | Backend | Python |
+| Database | PostgreSQL |
 | SIEM | ELK Stack |
 | Cloud | AWS EC2 |
+| Deployment | Render |
 | Containers | Docker |
 | Detection Engine | Python |
 | Automation | Python SOAR Scripts |
@@ -97,6 +119,14 @@ Deployment includes:
 - live telemetry generation
 
 ---
+
+## 🌐 Live Deployment
+
+Live Dashboard:
+
+👉 https://soc-siem-dashboard.onrender.com
+
+The dashboard is publicly deployed and accessible through Render cloud hosting.
 
 # 📊 Dashboard Features
 
@@ -263,6 +293,7 @@ soc-siem-threat-detection/
 │   ├── block_ip.py
 │   └── auto_block.py
 ├── dashboard.py
+├── db_writer.py
 ├── live_attack_generator.py
 ├── docker-compose.yml
 └── README.md
@@ -294,7 +325,7 @@ source venv/bin/activate
 ## 3. Install Dependencies
 
 ```bash
-pip install streamlit pandas plotly
+pip install -r requirements.txt
 ```
 
 ---
@@ -307,7 +338,7 @@ python3 -m streamlit run dashboard.py --server.port 8501 --server.address 0.0.0.
 
 ---
 
-## 5. Start Live Attack Generator
+## 5. Start Live Telemetry Pipeline
 
 Open another terminal:
 
@@ -316,6 +347,14 @@ source venv/bin/activate
 python3 live_attack_generator.py
 ```
 
+Open another terminal:
+
+```bash
+source venv/bin/activate
+python3 db_writer.py
+```
+
+This continuously generates simulated attacks and writes telemetry into PostgreSQL for real-time dashboard updates.
 ---
 
 # 🎯 Learning Outcomes
