@@ -124,7 +124,7 @@ Deployment includes:
 
 Live Dashboard:
 
-👉 https://soc-siem-dashboard.onrender.com
+👉 http://23.20.45.8:8501/
 
 The dashboard is publicly deployed and accessible through Render cloud hosting.
 
