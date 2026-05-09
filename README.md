@@ -1,4 +1,4 @@
-# 🔐 SOC + SIEM + SOAR Threat Detection & Automated Response System
+# 🔐 NovaSOC
 
 ## 🚀 Overview
 
