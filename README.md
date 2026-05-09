@@ -25,7 +25,7 @@ The platform detects threats, visualizes cyberattacks, automatically responds to
 
 Watch the full project walkthrough and live demonstration here:
 
-👉 https://www.loom.com/share/2c5df19198724f3fbf375cb88da77521
+👉 https://www.loom.com/share/8ba09c1b44544312844e2c3a4c1f96b5
 
 The demo includes:
 
