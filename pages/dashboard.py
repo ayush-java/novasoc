@@ -6,6 +6,19 @@ import time
 from datetime import datetime
 import plotly.express as px
 import psycopg2
+from dotenv import load_dotenv
+
+load_dotenv()
+
+from auth import supabase
+
+# =====================================================
+# CHECK AUTH SESSION
+# =====================================================
+
+if "logged_in" not in st.session_state:
+
+    st.switch_page("login.py")
 
 # =====================================================
 # PAGE CONFIG
@@ -16,7 +29,6 @@ st.set_page_config(
     page_icon="🛡️",
     layout="wide"
 )
-
 
 # =====================================================
 # CUSTOM CSS
@@ -66,6 +78,19 @@ section[data-testid="stSidebar"] {
 # =====================================================
 
 st.sidebar.title("🛡️ SOC Enterprise")
+
+# =====================================================
+# LOGOUT BUTTON
+# =====================================================
+
+if st.sidebar.button("Logout"):
+
+    supabase.auth.sign_out()
+
+    if "logged_in" in st.session_state:
+        del st.session_state["logged_in"]
+
+    st.switch_page("login.py")
 
 refresh_rate = st.sidebar.slider(
     "Auto Refresh",
@@ -659,8 +684,4 @@ Last Updated: {current_time}
 # =====================================================
 
 time.sleep(refresh_rate)
-
-st.rerun()
-time.sleep(refresh_rate)
-
 st.rerun()
