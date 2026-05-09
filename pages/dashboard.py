@@ -10,8 +10,56 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-from auth import supabase
+DATABASE_URL = os.getenv("DATABASE_URL")
 
+BLOCKED_FILE = "data/blocked_ips.txt"
+
+from auth import supabase
+# =====================================================
+# ACTIVITY LOGGER
+# =====================================================
+
+def log_user_activity(
+    email,
+    action,
+    login_method="unknown"
+):
+
+    try:
+
+        conn = psycopg2.connect(DATABASE_URL)
+
+        cur = conn.cursor()
+
+        cur.execute(
+            """
+
+            INSERT INTO user_activity_logs
+            (
+                email,
+                action,
+                login_method
+            )
+
+            VALUES (%s, %s, %s)
+
+            """,
+            (
+                email,
+                action,
+                login_method
+            )
+        )
+
+        conn.commit()
+
+        cur.close()
+
+        conn.close()
+
+    except Exception as e:
+
+        print(e)
 # =====================================================
 # CHECK AUTH SESSION
 # =====================================================
@@ -19,6 +67,33 @@ from auth import supabase
 if "logged_in" not in st.session_state:
 
     st.switch_page("login.py")
+
+# =====================================================
+# TRACK USER ACCESS
+# =====================================================
+
+user_email = "guest_user"
+
+login_method = "guest"
+
+try:
+
+    user = supabase.auth.get_user()
+
+    if user and user.user:
+
+        user_email = user.user.email
+
+        login_method = "google/email"
+
+except:
+    pass
+
+log_user_activity(
+    user_email,
+    "Opened Dashboard",
+    login_method
+)
 
 # =====================================================
 # PAGE CONFIG
@@ -85,6 +160,12 @@ st.sidebar.title("🛡️ SOC Enterprise")
 
 if st.sidebar.button("Logout"):
 
+    log_user_activity(
+        user_email,
+        "Logged Out",
+        login_method
+    )
+
     supabase.auth.sign_out()
 
     if "logged_in" in st.session_state:
@@ -126,8 +207,7 @@ st.sidebar.markdown("""
 # =====================================================
 # FILES
 # =====================================================
-DATABASE_URL = os.getenv("DATABASE_URL")
-BLOCKED_FILE = "data/blocked_ips.txt"
+
 # =====================================================
 # LOAD ALERTS FROM POSTGRESQL
 # =====================================================

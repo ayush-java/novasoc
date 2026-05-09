@@ -40,7 +40,7 @@ google_auth_url = supabase.auth.sign_in_with_oauth(
     {
         "provider": "google",
         "options": {
-            "redirect_to": "http://localhost:8501"
+            "redirect_to": "http://23.20.45.8:8501"
         }
     }
 ).url
