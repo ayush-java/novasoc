@@ -2,6 +2,14 @@ import json
 import random
 import time
 from datetime import datetime
+import psycopg2
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 ALERTS_FILE = "data/alerts.json"
 
@@ -58,6 +66,7 @@ print("🚀 Live Attack Generator Started...")
 
 while True:
 
+    
     attack = {
         "timestamp": datetime.now().strftime(
             "%Y-%m-%d %H:%M:%S"
@@ -69,10 +78,50 @@ while True:
         "status": random.choice(statuses),
         "threat_score": random.randint(40, 100),
         "mitre_tactic": random.choice(mitre_tactics)
-    }
+}
+   
+    try:
 
-    with open(ALERTS_FILE, "a") as f:
-        f.write(json.dumps(attack) + "\n")
+        conn = psycopg2.connect(
+            DATABASE_URL,
+            sslmode="require"
+        )
+
+        cur = conn.cursor()
+
+        cur.execute("""
+
+        INSERT INTO alerts (
+            timestamp,
+            ip,
+            country,
+            attack_type,
+            severity,
+            threat_score
+        )
+
+        VALUES (%s, %s, %s, %s, %s, %s)
+
+        """, (
+
+            attack['timestamp'],
+            attack['ip'],
+            attack['country'],
+            attack['attack_type'],
+            attack['severity'],
+            attack['threat_score']
+
+        ))
+
+        conn.commit()
+
+        cur.close()
+
+        conn.close()
+
+    except Exception as e:
+
+        print(f"Database Error: {e}")
 
     print(
         f"🚨 New Attack Generated: "
