@@ -281,7 +281,7 @@ soc-siem-threat-detection/
 │   ├── alerts.json
 │   └── blocked_ips.txt
 ├── docs/
-│   ├── architecture.png
+│   ├── Architecture.png
 │   ├── OverviewTab.png
 │   ├── GlobalThreats.png
 │   ├── IncidentsTab.png
