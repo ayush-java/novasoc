@@ -59,7 +59,7 @@ The demo includes:
 
 ## 🏗️ Architecture
 
-![SOC Architecture](docs/architecture.png)
+![SOC Architecture](docs/architecture.png?v=2)
 
 ```text
 Attacker Activity
