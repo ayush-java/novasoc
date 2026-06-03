@@ -33,19 +33,6 @@ if "logged_in" in st.session_state:
         st.switch_page("pages/dashboard.py")
 
 # =====================================================
-# GOOGLE AUTH URL
-# =====================================================
-
-google_auth_url = supabase.auth.sign_in_with_oauth(
-    {
-        "provider": "google",
-        "options": {
-            "redirect_to": "http://23.20.45.8:8501"
-        }
-    }
-).url
-
-# =====================================================
 # CAPTCHA GENERATION
 # =====================================================
 
@@ -214,28 +201,6 @@ if st.button("Login"):
         st.error("Invalid email or password")
 
 # =====================================================
-# DIVIDER
-# =====================================================
-
-st.markdown("""
-<div style='text-align:center; margin-top:25px; margin-bottom:20px; color:gray;'>
-────────── OR ──────────
-</div>
-""", unsafe_allow_html=True)
-
-# =====================================================
-# GOOGLE LOGIN
-# =====================================================
-
-st.markdown(f"""
-<a href="{google_auth_url}" target="_self" class="social-btn">
-<img class="social-logo"
-src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/google/google-original.svg">
-Continue with Google
-</a>
-""", unsafe_allow_html=True)
-
-# =====================================================
 # GUEST ACCESS
 # =====================================================
 
@@ -251,24 +216,23 @@ st.info(
     f"{st.session_state.captcha_b}"
 )
 
-guest_captcha = st.text_input(
-    "Enter CAPTCHA Answer",
-    placeholder="Solve the math problem",
-    key="guest_captcha"
-)
+with st.form("guest_login_form"):
 
-continue_guest = st.button(
-    "Continue as Guest",
-    use_container_width=True
-)
+    guest_captcha = st.text_input(
+        "Enter CAPTCHA Answer",
+        placeholder="Solve the math problem"
+    )
+
+    continue_guest = st.form_submit_button(
+        "Continue as Guest",
+        use_container_width=True
+    )
 
 if continue_guest:
 
     try:
 
-        entered_answer = int(
-            st.session_state.guest_captcha
-        )
+        entered_answer = int(guest_captcha.strip())
 
         if entered_answer == captcha_answer:
 
@@ -276,13 +240,17 @@ if continue_guest:
 
             st.session_state.guest_user = True
 
+            st.session_state.captcha_a = random.randint(1, 9)
+
+            st.session_state.captcha_b = random.randint(1, 9)
+
             st.switch_page("pages/dashboard.py")
 
         else:
 
             st.error("Incorrect CAPTCHA")
 
-    except:
+    except ValueError:
 
         st.error("Please enter a valid number")
 
